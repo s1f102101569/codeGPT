@@ -117,10 +117,12 @@ async function getFixSuggestion(code: string): Promise<{ fixedCode: string, expl
     console.log("ChatGPT completion content:", content);  // デバッグログ
 
     if (content) {
+      // 不要な部分を除去し、整形
+      const cleanedContent = content.replace(/Here is the corrected code snippet:|Corrected code:/g, '').trim();
+      
       // "修正内容の説明:" を使ってコードと説明を分ける
-      const [fixedCodePart, explanationPart] = content.split("修正内容の説明:");
+      const [fixedCodePart, explanationPart] = cleanedContent.split("修正内容の説明:");
       if (fixedCodePart && explanationPart) {
-        // 不要な部分を除去し、整形
         const fixedCode = fixedCodePart.replace(/```python|```/g, '').trim();
         const explanation = explanationPart.trim();
         console.log("Parsed fixed code:", fixedCode);  // デバッグログ
@@ -302,6 +304,7 @@ export function activate(context: vscode.ExtensionContext) {
           if (message.command === "applyFix") {
             const editor = vscode.window.activeTextEditor;
             if (editor) {
+              const document = editor.document;
               const entireRange = new vscode.Range(
                 document.positionAt(0),
                 document.positionAt(document.getText().length)
@@ -358,7 +361,6 @@ function getWebviewContent(fixedCode: string, explanation: string, hasFix: boole
     </html>
   `;
 }
-
 function getWebviewContentChatGPT() {
   return `
     <!DOCTYPE html>

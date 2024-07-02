@@ -1,5 +1,5 @@
-result = 10 * 3
-
-result *= 2
-
-print(result) )
+class Foo:
+    def exe(self):
+        print("foo!!")
+        
+f = Foo()
